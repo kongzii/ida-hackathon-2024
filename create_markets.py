@@ -12,6 +12,7 @@ from prediction_market_agent_tooling.markets.omen.data_models import (
 from prediction_market_agent_tooling.tools.utils import utcnow
 from datetime import timedelta
 from prediction_market_agent_tooling.markets.omen.omen import (
+    OmenMarket,
     omen_create_market_tx,
     APIKeys,
     xDai,
@@ -88,13 +89,16 @@ st.write(question)
 closing_time = utcnow() + timedelta(days=7)
 
 if st.button("Create this market?"):
-    omen_create_market_tx(
-        APIKeys(),
-        initial_funds=xDai(0.01),  # Create only with a small liquidity.
-        question=question,
-        closing_time=closing_time,
-        category="ida-hackathon-2024",
-        language="en",
-        outcomes=OMEN_BINARY_MARKET_OUTCOMES,
-        auto_deposit=True,  # Auto-convert xDai into wxDai (required).
+    market = OmenMarket.from_created_market(
+        omen_create_market_tx(
+            APIKeys(),  # Will load `BET_FROM_PRIVATE_KEY` from .env file.
+            initial_funds=xDai(0.01),  # Create only with a small liquidity.
+            question=question,
+            closing_time=closing_time,
+            category="ida-hackathon-2024",  # Don't change, so we can identify these markets.
+            language="en",
+            outcomes=OMEN_BINARY_MARKET_OUTCOMES,  # We can work only with [Yes, No] markets.
+            auto_deposit=True,  # Auto-convert xDai into wxDai (required).
+        )
     )
+    st.write(f"Market created at {market.url}.")
