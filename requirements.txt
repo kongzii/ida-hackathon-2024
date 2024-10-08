@@ -5,3 +5,4 @@ langchain
 langchain-openai
 pydantic
 firecrawl-py
+prediction-market-agent-tooling

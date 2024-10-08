@@ -6,6 +6,16 @@ from dotenv import load_dotenv
 from langchain.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
 from firecrawl.firecrawl import FirecrawlApp
+from prediction_market_agent_tooling.markets.omen.data_models import (
+    OMEN_BINARY_MARKET_OUTCOMES,
+)
+from prediction_market_agent_tooling.tools.utils import utcnow
+from datetime import timedelta
+from prediction_market_agent_tooling.markets.omen.omen import (
+    omen_create_market_tx,
+    APIKeys,
+    xDai,
+)
 
 load_dotenv()
 
@@ -31,7 +41,8 @@ def llm(results: list[str]) -> str:
         api_key=os.environ["OPENAI_API_KEY"],
         temperature=1,
     )
-    template = """Given the following results from Google, create a prediction market question in Yes/No format, resolvable in 2 days, mention dates in UTC format.
+    template = f"""Today is {utcnow()}.
+    Given the following results from Google, create a prediction market question in Yes/No format, resolvable in 2 days, mention dates in UTC format.
     Only output the question itself, nothing else.
 
     Results: {results}
@@ -72,3 +83,18 @@ with st.spinner():
 
 st.markdown("### Generated question:")
 st.write(question)
+
+# In the prompt we ask for markets resolvable in 2 days, but close the market in 7 days just to be sure.
+closing_time = utcnow() + timedelta(days=7)
+
+if st.button("Create this market?"):
+    omen_create_market_tx(
+        APIKeys(),
+        initial_funds=xDai(0.01),  # Create only with a small liquidity.
+        question=question,
+        closing_time=closing_time,
+        category="ida-hackathon-2024",
+        language="en",
+        outcomes=OMEN_BINARY_MARKET_OUTCOMES,
+        auto_deposit=True,  # Auto-convert xDai into wxDai (required).
+    )

@@ -36,9 +36,10 @@ cp .env.example .env
 
 And fill in the API keys:
 
-- SERPER_API_KEY: can be obtained for free on https://serper.dev
-- FIRECRAWL_API_KEY: can be obtained for free on 
-- OPENAI_API_KEY: I can send you one 
+- SERPER_API_KEY: can be obtained for free on https://serper.dev (Required for google search function)
+- FIRECRAWL_API_KEY: can be obtained for free on (Required for web scraping function)
+- OPENAI_API_KEY: I can send you one (Required for LLM calls)
+- BET_FROM_PRIVATE_KEY: Create wallet on Gnosis Chain, for example with [MetaMask](https://metamask.io/) and I can send you some xDai (Required for creating a market)
 
 ## Run
 
