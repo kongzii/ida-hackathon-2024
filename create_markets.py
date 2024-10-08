@@ -69,7 +69,7 @@ if not query and not website_url:
     st.warning("Please provide google query or website url.")
     st.stop()
 
-with st.spinner():
+with st.spinner("Interneting"):
     results = (
         query_google_seach(query)
         if not website_url
@@ -79,7 +79,7 @@ with st.spinner():
 st.markdown("### Found results:")
 st.markdown("\n".join(f"- {r}" for r in results).replace("$", "\\$"))
 
-with st.spinner():
+with st.spinner("Running LLM"):
     question = llm(results)
 
 st.markdown("### Generated question:")
@@ -89,16 +89,17 @@ st.write(question)
 closing_time = utcnow() + timedelta(days=7)
 
 if st.button("Create this market?"):
-    market = OmenMarket.from_created_market(
-        omen_create_market_tx(
-            APIKeys(),  # Will load `BET_FROM_PRIVATE_KEY` from .env file.
-            initial_funds=xDai(0.01),  # Create only with a small liquidity.
-            question=question,
-            closing_time=closing_time,
-            category="ida-hackathon-2024",  # Don't change, so we can identify these markets.
-            language="en",
-            outcomes=OMEN_BINARY_MARKET_OUTCOMES,  # We can work only with [Yes, No] markets.
-            auto_deposit=True,  # Auto-convert xDai into wxDai (required).
+    with st.spinner("Creating market"):
+        market = OmenMarket.from_created_market(
+            omen_create_market_tx(
+                APIKeys(),  # Will load `BET_FROM_PRIVATE_KEY` from .env file.
+                initial_funds=xDai(0.01),  # Create only with a small liquidity.
+                question=question,
+                closing_time=closing_time,
+                category="ida-hackathon-2024",  # Don't change, so we can identify these markets.
+                language="en",
+                outcomes=OMEN_BINARY_MARKET_OUTCOMES,  # We can work only with [Yes, No] markets.
+                auto_deposit=True,  # Auto-convert xDai into wxDai (required).
+            )
         )
-    )
     st.write(f"Market created at {market.url}.")
