@@ -47,12 +47,21 @@ def scrap_url_content(url: str) -> str:
     return scraped["markdown"]
 
 
-query = st.text_input(
-    label="Google Search input", value="What is the current Ethereum price?"
-)
+st.write("Input a google query")
+query = st.text_input(label="Google Search input", value=None)
+st.write("Or directly a webiste link")
+website_url = st.text_input(label="Website URL", value=None)
+
+if not query and not website_url:
+    st.warning("Please provide google query or website url.")
+    st.stop()
 
 with st.spinner():
-    results = query_google_seach(query)
+    results = (
+        query_google_seach(query)
+        if not website_url
+        else [scrap_url_content(website_url)]
+    )
 
 st.markdown("### Found results:")
 st.markdown("\n".join(f"- {r}" for r in results).replace("$", "\\$"))
