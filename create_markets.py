@@ -1,4 +1,3 @@
-import json
 import os
 
 import requests
@@ -13,12 +12,14 @@ load_dotenv()
 
 def query_google_seach(q: str) -> list[str]:
     url = "https://google.serper.dev/search"
-    payload = json.dumps({"q": q})
-    headers = {
-        "X-API-KEY": os.environ["SERPER_API_KEY"],
-        "Content-Type": "application/json",
-    }
-    response = requests.post(url, headers=headers, data=payload)
+    response = requests.post(
+        url,
+        headers={
+            "X-API-KEY": os.environ["SERPER_API_KEY"],
+            "Content-Type": "application/json",
+        },
+        json={"q": q},
+    )
     response.raise_for_status()
     parsed = response.json()
     return [x["snippet"] for x in parsed["organic"]]
