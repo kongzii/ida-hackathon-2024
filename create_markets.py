@@ -1,12 +1,12 @@
 import json
 import os
-import re
 
 import requests
 import streamlit as st
 from dotenv import load_dotenv
 from langchain.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
+from firecrawl.firecrawl import FirecrawlApp
 
 load_dotenv()
 
@@ -41,20 +41,10 @@ def llm(results: list[str]) -> str:
     return completion
 
 
-def get_url_content(url: str) -> str:
-    if not url.startswith("http"):
-        url = "https://" + url
-    response = requests.get(url)
-    response.raise_for_status()
-    content = response.text
-    # Remove HTML tags using regex (simple approach)
-    # Remove script and style elements
-    content = re.sub(r"<(script|style).*?>.*?(</\1>)", "", content, flags=re.DOTALL)
-    # Remove all HTML tags
-    content = re.sub(r"<.*?>", "", content)
-    # Replace multiple whitespace with single space
-    cleaned_text = " ".join(content.split())
-    return cleaned_text
+def scrap_url_content(url: str) -> str:
+    app = FirecrawlApp(api_key=os.environ["FIRECRAWL_API_KEY"])
+    scraped = app.scrape_url(url, params={"formats": ["markdown"]})
+    return scraped["markdown"]
 
 
 query = st.text_input(

@@ -37,6 +37,7 @@ cp .env.example .env
 And fill in the API keys:
 
 - SERPER_API_KEY: can be obtained for free on https://serper.dev
+- FIRECRAWL_API_KEY: can be obtained for free on 
 - OPENAI_API_KEY: I can send you one 
 
 ## Run
